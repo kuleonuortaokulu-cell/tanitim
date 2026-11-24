@@ -97,7 +97,7 @@
                     </div>
                 </a>
 
-                <!-- Masaüstü Menü Linkleri (Yeni Öncelik Sırasına Göre) -->
+                <!-- Masaüstü Menü Linkleri (Öncelik Sırasına Göre) -->
                 <nav class="hidden xl:flex items-center gap-6 text-sm font-medium text-slate-600">
                     <a href="#projeler" class="hover:text-navy-900 transition-colors font-semibold text-navy-900" data-i18n="nav_projects">Projelerimiz</a>
                     <a href="#isbirligi" class="hover:text-navy-900 transition-colors" data-i18n="nav_collab">İşbirliği</a>
@@ -629,7 +629,7 @@
                     </div>
                 </div>
 
-                <!-- Sağ Kolon: Doğrudan Tarayıcı İçi Çalışan FormSubmit İletişim Formu -->
+                <!-- Sağ Kolon: Düzeltilmiş FormSubmit AJAX İletişim Formu -->
                 <div class="lg:col-span-6 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
                     <div class="mb-6">
                         <h3 class="text-xl font-bold text-navy-900 flex items-center gap-2">
@@ -641,8 +641,7 @@
                         </p>
                     </div>
 
-                    <form id="sister-school-form" action="https://formsubmit.co/kuleonuortaokulu@gmail.com" method="POST" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                        <!-- FormSubmit Yapılandırma Alanları -->
+                    <form id="sister-school-form" class="space-y-4">
                         <input type="hidden" name="_subject" value="Yeni Kardeş Okul İşbirliği Mesajı - Kuleönü Ortaokulu">
                         <input type="hidden" name="_template" value="table">
                         <input type="hidden" name="_captcha" value="false">
@@ -684,19 +683,43 @@
                                       class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-navy-900 focus:border-transparent transition-all"></textarea>
                         </div>
 
-                        <button type="submit" id="submit-btn" class="w-full py-3.5 px-6 rounded-xl bg-roseIsparta-500 hover:bg-roseIsparta-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-roseIsparta-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer">
-                            <i data-lucide="send" class="w-4 h-4"></i>
-                            <span id="submit-btn-text" data-i18n="form_submit_btn">Mesajı Doğrudan Gönder</span>
-                        </button>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button type="submit" id="submit-btn" class="flex-1 py-3.5 px-6 rounded-xl bg-roseIsparta-500 hover:bg-roseIsparta-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-roseIsparta-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span id="submit-btn-text" data-i18n="form_submit_btn">Mesajı Doğrudan Gönder</span>
+                            </button>
+
+                            <button type="button" onclick="sendViaGmailWeb()" class="py-3.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-navy-900 font-bold text-xs sm:text-sm border border-slate-300 flex items-center justify-center gap-2 transition-all cursor-pointer">
+                                <i data-lucide="external-link" class="w-4 h-4 text-roseIsparta-500"></i>
+                                <span data-i18n="form_gmail_btn">Gmail ile Gönder</span>
+                            </button>
+                        </div>
                     </form>
 
-                    <!-- Gönderim Durumu Bildirim Kutusu -->
-                    <div id="form-feedback" role="status" aria-live="polite" class="hidden mt-4 p-4 rounded-xl text-xs sm:text-sm">
+                    <!-- Başarılı Gönderim Kutusu -->
+                    <div id="form-success" class="hidden mt-4 p-4 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs sm:text-sm">
                         <div class="flex items-start gap-2.5">
                             <i data-lucide="check-circle" class="w-5 h-5 text-tealEco-600 shrink-0 mt-0.5"></i>
                             <div>
-                                <p class="font-bold" id="feedback-title">Gönderim durumu</p>
-                                <p class="mt-1" id="feedback-desc"></p>
+                                <p class="font-bold" data-i18n="form_success_title">Mesajınız başarıyla iletildi!</p>
+                                <p class="mt-1 text-teal-800" data-i18n="form_success_desc">
+                                    Teşekkür ederiz. İletiniz <strong>kuleonuortaokulu@gmail.com</strong> adresine gönderildi; ekibimiz en kısa sürede sizinle iletişime geçecektir.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hata Durumu Kutusu -->
+                    <div id="form-error" class="hidden mt-4 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm">
+                        <div class="flex items-start gap-2.5">
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-roseIsparta-600 shrink-0 mt-0.5"></i>
+                            <div>
+                                <p class="font-bold" data-i18n="form_error_title">Mesaj gönderimi tamamlanamadı.</p>
+                                <p id="form-error-detail" class="mt-1 text-rose-800"></p>
+                                <button type="button" onclick="sendViaGmailWeb()" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-roseIsparta-600 text-white text-xs font-bold hover:bg-roseIsparta-700 cursor-pointer">
+                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                                    <span data-i18n="form_gmail_fallback_btn">Mesajı Gmail Üzerinden Gönder</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -767,9 +790,8 @@
         </div>
     </footer>
 
-    <!-- ÇOK DİLLİ ÇEVİRİ MOTORU (TR / EN) VE FORM YÖNETİMİ -->
+    <!-- ÇOK DİLLİ ÇEVİRİ MOTORU (TR / EN) VE DÜZELTİLMİŞ FORM GÖNDERİMİ -->
     <script>
-        // Lucide ikonlarını başlat
         lucide.createIcons();
 
         const translations = {
@@ -882,8 +904,11 @@
                 opt_other: "Diğer İşbirliği Önerisi",
                 form_msg_label: "Mesajınız ve Proje Öneriniz *",
                 form_submit_btn: "Mesajı Doğrudan Gönder",
+                form_gmail_btn: "Gmail ile Gönder",
                 form_success_title: "Mesajınız başarıyla iletildi!",
                 form_success_desc: "Teşekkür ederiz. İletiniz <strong>kuleonuortaokulu@gmail.com</strong> adresine gönderildi; ekibimiz en kısa sürede sizinle iletişime geçecektir.",
+                form_error_title: "Mesaj gönderimi tamamlanamadı.",
+                form_gmail_fallback_btn: "Mesajı Gmail Üzerinden Gönder",
 
                 footer_school: "Kuleönü Ortaokulu",
                 footer_ministry: "T.C. Millî Eğitim Bakanlığı • Isparta",
@@ -1004,8 +1029,11 @@
                 opt_other: "Other Collaboration Proposal",
                 form_msg_label: "Your Message & Project Proposal *",
                 form_submit_btn: "Send Message Directly",
+                form_gmail_btn: "Send via Gmail",
                 form_success_title: "Your message has been sent!",
                 form_success_desc: "Thank you! Your inquiry has been delivered to <strong>kuleonuortaokulu@gmail.com</strong>. Our coordination team will reply shortly.",
+                form_error_title: "Message delivery could not be completed.",
+                form_gmail_fallback_btn: "Send Message via Gmail Web",
 
                 footer_school: "Kuleönü Secondary School",
                 footer_ministry: "Republic of Türkiye Ministry of National Education • Isparta",
@@ -1084,77 +1112,81 @@
             }, 2000);
         }
 
-        // FormSubmit AJAX gönderimi: HTTP yanıtı ve servis sonucu ayrı ayrı kontrol edilir.
-        function showFormFeedback(type, title, message) {
-            const feedback = document.getElementById('form-feedback');
-            const titleEl = document.getElementById('feedback-title');
-            const descEl = document.getElementById('feedback-desc');
-            const icon = document.getElementById('feedback-icon');
+        // Form verilerini alarak Gmail Web taslağı açar
+        function sendViaGmailWeb() {
+            const school = document.getElementById('schoolName').value.trim();
+            const country = document.getElementById('countryCity').value.trim();
+            const email = document.getElementById('senderEmail').value.trim();
+            const topic = document.getElementById('collabTopic').value;
+            const message = document.getElementById('messageBody').value.trim();
 
-            feedback.classList.remove('hidden', 'bg-teal-50', 'border-teal-200', 'text-teal-900', 'bg-rose-50', 'border-rose-200', 'text-rose-900', 'bg-amber-50', 'border-amber-200', 'text-amber-900');
-            feedback.classList.add('border', 'rounded-xl');
-            titleEl.textContent = title;
-            descEl.textContent = message;
-
-            if (type === 'success') {
-                feedback.classList.add('bg-amber-50', 'border-amber-200', 'text-amber-900');
-                icon.setAttribute('data-lucide', 'mail-check');
-            } else {
-                feedback.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-900');
-                icon.setAttribute('data-lucide', 'alert-circle');
-            }
-            if (window.lucide) lucide.createIcons();
-            feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const subject = encodeURIComponent(`Sister School Collaboration: ${topic}${school ? ' - ' + school : ''}`);
+            const bodyLines = [
+                `School / Institution: ${school || '-'}`,
+                `Country / City: ${country || '-'}`,
+                `Contact Email: ${email || '-'}`,
+                `Topic: ${topic}`,
+                ``,
+                `Message:`,
+                `${message || ''}`
+            ];
+            const body = encodeURIComponent(bodyLines.join('\n'));
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=kuleonuortaokulu@gmail.com&su=${subject}&body=${body}`;
+            window.open(gmailUrl, '_blank', 'noopener,noreferrer');
         }
 
-        async function handleFormSubmit(event) {
-            event.preventDefault();
+        // Düzeltilmiş FormSubmit AJAX Gönderim Dinleyicisi (e.currentTarget üzerinden güvenli FormData)
+        const sisterForm = document.getElementById('sister-school-form');
+        if (sisterForm) {
+            sisterForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-            const form = document.getElementById('sister-school-form');
-            const submitBtn = document.getElementById('submit-btn');
-            const submitBtnText = document.getElementById('submit-btn-text');
-            const originalBtnLabel = submitBtnText.textContent;
-            const isEnglish = currentLang === 'en';
+                const form = e.currentTarget;
+                const submitBtn = document.getElementById('submit-btn');
+                const submitBtnText = document.getElementById('submit-btn-text');
+                const successBox = document.getElementById('form-success');
+                const errorBox = document.getElementById('form-error');
+                const errorDetail = document.getElementById('form-error-detail');
 
-            submitBtn.disabled = true;
-            submitBtnText.textContent = isEnglish ? 'Sending...' : 'Gönderiliyor...';
+                if (successBox) successBox.classList.add('hidden');
+                if (errorBox) errorBox.classList.add('hidden');
 
-            try {
-                const response = await fetch('https://formsubmit.co/ajax/kuleonuortaokulu@gmail.com', {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json' },
-                    body: new FormData(form)
-                });
-
-                let result = {};
-                const responseText = await response.text();
-                try { result = responseText ? JSON.parse(responseText) : {}; }
-                catch (_) { result = { message: responseText }; }
-
-                const serviceAccepted = result.success === true || result.success === 'true';
-                if (!response.ok || !serviceAccepted) {
-                    const detail = result.message || (isEnglish ? `The email service returned HTTP ${response.status}.` : `E-posta servisi HTTP ${response.status} yanıtı verdi.`);
-                    throw new Error(detail);
+                const originalBtnLabel = submitBtnText ? submitBtnText.innerText : '';
+                if (submitBtn) submitBtn.disabled = true;
+                if (submitBtnText) {
+                    submitBtnText.innerText = currentLang === 'tr' ? 'Gönderiliyor...' : 'Sending...';
                 }
 
-                showFormFeedback(
-                    'success',
-                    isEnglish ? 'Request received; delivery is not yet confirmed.' : 'Gönderim isteği alındı; e-posta teslimatı henüz doğrulanmadı.',
-                    isEnglish
-                        ? 'IMPORTANT: This is the first use of this FormSubmit address. Check the inbox and spam folder of kuleonuortaokulu@gmail.com for a FormSubmit activation email, then click its Activate Form link. Until the address is activated, messages from this form may not be delivered. After activation, submit a test message.'
-                        : 'ÖNEMLİ: Bu FormSubmit adresi ilk kez kullanılıyor. kuleonuortaokulu@gmail.com gelen kutusunu ve Spam klasörünü kontrol edin. FormSubmit tarafından gönderilen doğrulama e-postasını açıp “Activate Form” bağlantısına tıklayın. Adres etkinleştirilmeden bu formdan gelen mesajlar teslim edilmeyebilir. Etkinleştirdikten sonra yeniden bir test mesajı gönderin.'
-                );
-                form.reset();
-            } catch (error) {
-                showFormFeedback(
-                    'error',
-                    isEnglish ? 'Message could not be confirmed.' : 'Mesaj gönderimi doğrulanamadı.',
-                    (isEnglish ? 'Details: ' : 'Ayrıntı: ') + (error.message || (isEnglish ? 'Network or CORS error.' : 'Ağ veya CORS hatası.')) + (isEnglish ? ' Check your internet connection. If you opened this page as a local file, test it after publishing the HTML on your website.' : ' İnternet bağlantınızı kontrol edin. Sayfayı bilgisayarınızda yerel dosya olarak açtıysanız HTML dosyasını web sitenizde yayınladıktan sonra tekrar deneyin.')
-                );
-            } finally {
-                submitBtn.disabled = false;
-                submitBtnText.textContent = originalBtnLabel;
-            }
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch('https://formsubmit.co/ajax/kuleonuortaokulu@gmail.com', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json().catch(() => ({}));
+
+                    if (response.ok && (result.success === 'true' || result.success === true || !result.message)) {
+                        if (successBox) successBox.classList.remove('hidden');
+                        form.reset();
+                    } else {
+                        throw new Error(result.message || 'FormSubmit sunucu yanıtı başarısız.');
+                    }
+                } catch (err) {
+                    if (errorDetail) {
+                        errorDetail.innerText = currentLang === 'tr'
+                            ? `Ayrıntı: ${err.message}. Dilerseniz sağdaki "Gmail ile Gönder" butonunu kullanabilirsiniz.`
+                            : `Detail: ${err.message}. You can use the "Send via Gmail" button below.`;
+                    }
+                    if (errorBox) errorBox.classList.remove('hidden');
+                } finally {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (submitBtnText) submitBtnText.innerText = originalBtnLabel;
+                }
+            });
         }
     </script>
 </body>
